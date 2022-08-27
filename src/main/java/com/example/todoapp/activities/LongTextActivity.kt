@@ -27,7 +27,7 @@ class LongTextActivity : AppCompatActivity() {
         }
 
         reminder_button.setOnClickListener{
-            Snackbar.make(card_view, "Not yet implemented!", Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(card_view, "Not implemented yet", Snackbar.LENGTH_SHORT).show()
         }
     }
 }

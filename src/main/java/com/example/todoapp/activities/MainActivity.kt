@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                 super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
                 Log.d("longtexts:", "positions: $fromPos $toPos $longTexts")
                 updateLongTextMap(fromPos, toPos)
-                if(!dragged) viewHolder.itemView.alpha = 1.0f
+                if(!dragged || fromPos == toPos) viewHolder.itemView.alpha = 1.0f
                 //recyclerView.scrollToPosition(toPos)
             }
 
@@ -294,7 +294,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
             recyclerView?.smoothScrollToPosition(data!!.size - 1)
             setTaskNumber()
             longTexts[data!!.lastIndex] = ""
-            //recyclerView?.scrollToPosition(data.size - 1)
+            recyclerView?.smoothScrollToPosition(data!!.size - 1)
         }
         else{
             Snackbar

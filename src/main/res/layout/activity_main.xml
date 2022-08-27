@@ -30,6 +30,7 @@
         android:fadeScrollbars="false"
         android:fadingEdge="vertical"
         android:fadingEdgeLength="150dp"
+        android:scrollbars="vertical"
         android:requiresFadingEdge="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
