@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
     private var adapter : RecyclerViewAdapter? = null
     private var data : ArrayList<Task>? = null
     private var recyclerView : RecyclerView? = null
+    private var dragged: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,14 +57,15 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         adapter = RecyclerViewAdapter(data!!, this)
         recyclerView?.adapter = adapter
 
+        //generateTestData()
+
         setTaskNumber()
 
         //Gesture listener
         val myCallback = object: ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
-
-            var from: Int = 0
-            var to: Int = 0
+            var from = 0
+            var to = 0
 
             override fun onMove(
                 recyclerView: RecyclerView,
@@ -85,14 +87,27 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                 data!![to] = originalPosData
                 data!![from] = otherData
 
+                //TODO: Fix item alpha...
                 viewHolder.itemView.alpha = 1.0f
 
-                //TODO: Fix long text when drag'n dropping
-                val temp = longTexts[from]
-                longTexts[from] = longTexts[to] as String
-                longTexts[to] = temp as String
-
+                dragged = true
                 return true
+            }
+
+            override fun onMoved(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                fromPos: Int,
+                target: RecyclerView.ViewHolder,
+                toPos: Int,
+                x: Int,
+                y: Int
+            ) {
+                super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
+                Log.d("longtexts:", "positions: $fromPos $toPos $longTexts")
+                updateLongTextMap(fromPos, toPos)
+                from = 0
+                to = 0
             }
 
 
@@ -104,13 +119,15 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                 }
             }
 
-            @SuppressLint("NotifyDataSetChanged")
             override fun clearView(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder
             ) {
-
                 super.clearView(recyclerView, viewHolder)
+                if(dragged){
+                    resetAdapter()
+                    dragged = false
+                }
             }
 
             override fun onChildDraw(
@@ -144,6 +161,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                         data?.removeAt(holder.adapterPosition)
                         removeLongTexts(holder.adapterPosition)
                         adapter?.notifyItemRemoved(holder.adapterPosition)
+                        //adapter?.notifyDataSetChanged()
 
                         //Reduce counter...
                         setTaskNumber()
@@ -184,6 +202,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                         val position = holder.adapterPosition
                         val currData = data!![position]
                         data?.removeAt(position)
+
                         adapter?.notifyItemRemoved(viewHolder.adapterPosition)
                         data?.add(position, currData)
                         adapter?.notifyItemInserted(position)
@@ -204,6 +223,19 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
             showAlertDialog(0, data!!)
         }
 
+    }
+
+    private fun updateLongTextMap(from: Int, to: Int) {
+        Log.d("updateLongTextMap", "from: $from, to: $to")
+        val temp = longTexts[from]
+        longTexts[from] = longTexts[to]!!
+        longTexts[to] = temp!!
+    }
+
+    private fun resetAdapter() {
+        adapter = RecyclerViewAdapter(data!!, this)
+        recyclerView?.adapter = adapter
+        adapter?.notifyItemRangeChanged(0, data!!.size)
     }
 
     override fun onPause() {
@@ -254,6 +286,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
             adapter?.notifyItemInserted(data.size - 1)
             recyclerView?.smoothScrollToPosition(data.size - 1)
             setTaskNumber()
+            longTexts[data.lastIndex] = ""
             //recyclerView?.scrollToPosition(data.size - 1)
         }
         else{
@@ -330,6 +363,14 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
             temp[keyTemp] = longTexts[key] as String
         }
         longTexts = temp
+    }
+
+    private fun generateTestData(){
+        for (i in 0..10){
+            data?.add(Task("Task $i", false))
+            longTexts[i] = i.toString()
+        }
+        adapter?.notifyItemRangeInserted(0, 10)
     }
 
     //OnClickListener for RecyclerView items
