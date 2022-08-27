@@ -1,4 +1,4 @@
-package com.example.todoapp
+package com.example.todoapp.activities
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -14,6 +14,9 @@ import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.todoapp.R
+import com.example.todoapp.RecyclerViewAdapter
+import com.example.todoapp.Task
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -22,7 +25,7 @@ import kotlinx.android.synthetic.main.card_view_task.view.*
 import kotlinx.android.synthetic.main.edit_text_layout.view.*
 import java.lang.reflect.Type
 
-class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListener{
+class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListener, CreateTaskFragment.CreateTaskListener {
 
     //To achieve static variable functionality...
     companion object{
@@ -45,17 +48,19 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         //Read data from SharedPreferences
         loadData()
 
+        //Initialize recycler view...
+        recyclerView = recViewId
+        recyclerView?.layoutManager = LinearLayoutManager(this)
+
+        adapter = RecyclerViewAdapter(data!!, this)
+        recyclerView?.adapter = adapter
+
         val taskIndex = intent.getIntExtra("index", -1)
         val taskLongText : String? = intent.getStringExtra("long_text")
 
         if(taskIndex != -1 && !taskLongText.isNullOrEmpty()){
             longTexts[taskIndex] = taskLongText
         }
-        recyclerView = recViewId
-        recyclerView?.layoutManager = LinearLayoutManager(this)
-
-        adapter = RecyclerViewAdapter(data!!, this)
-        recyclerView?.adapter = adapter
 
         //generateTestData()
 
@@ -87,9 +92,6 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                 data!![to] = originalPosData
                 data!![from] = otherData
 
-                //TODO: Fix item alpha...
-                viewHolder.itemView.alpha = 1.0f
-
                 dragged = true
                 return true
             }
@@ -106,8 +108,8 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                 super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
                 Log.d("longtexts:", "positions: $fromPos $toPos $longTexts")
                 updateLongTextMap(fromPos, toPos)
-                from = 0
-                to = 0
+                if(!dragged) viewHolder.itemView.alpha = 1.0f
+                //recyclerView.scrollToPosition(toPos)
             }
 
 
@@ -220,7 +222,12 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         myHelper.attachToRecyclerView(recyclerView)
 
         floatingActionButton.setOnClickListener {
-            showAlertDialog(0, data!!)
+            //showAlertDialog(0, data!!)
+            //val intent = Intent(this, TaskCreateActivity::class.java)
+            val createTaskFragment = CreateTaskFragment(this)
+            createTaskFragment.show(supportFragmentManager, "dialogFragment")
+
+            //startActivity(intent)
         }
 
     }
@@ -254,7 +261,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         val alertDialog = builder.create()
         builder.setPositiveButton("Add"){ _, _ ->
             val task = editText.text.toString()
-            addTask(task, data)
+            addTask(task)
         }
 
         builder.setNegativeButton("Cancel"){ _, _ ->
@@ -280,13 +287,13 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         builder.show()
     }
 
-    private fun addTask(task: String, data: ArrayList<Task>){
+    private fun addTask(task: String){
         if(task.isNotEmpty()){
-            data.add(Task(task, false))
-            adapter?.notifyItemInserted(data.size - 1)
-            recyclerView?.smoothScrollToPosition(data.size - 1)
+            data?.add(Task(task, false))
+            adapter?.notifyItemInserted(data!!.size - 1)
+            recyclerView?.smoothScrollToPosition(data!!.size - 1)
             setTaskNumber()
-            longTexts[data.lastIndex] = ""
+            longTexts[data!!.lastIndex] = ""
             //recyclerView?.scrollToPosition(data.size - 1)
         }
         else{
@@ -399,5 +406,9 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
             intent.putExtra("long_text", longTexts[position])
         }
         startActivity(intent)
+    }
+
+    override fun onCreateTask(task: String) {
+        addTask(task)
     }
 }

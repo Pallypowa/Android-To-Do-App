@@ -10,11 +10,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TodoApp">
         <activity
-            android:name=".LongTextActivity"
+            android:name=".activities.LongTextActivity"
             android:exported="false"
-            android:parentActivityName=".MainActivity" />
+            android:parentActivityName=".activities.MainActivity" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,8 +1,9 @@
-package com.example.todoapp
+package com.example.todoapp.activities
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.todoapp.R
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_long_text.*
 
