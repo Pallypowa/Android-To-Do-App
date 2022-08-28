@@ -1,13 +1,13 @@
 package com.example.todoapp
 
 import android.graphics.Paint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.todoapp.data.Task
 import kotlinx.android.synthetic.main.card_view_task.view.*
 
 class RecyclerViewAdapter(private var dataList: List<Task>, private var listener: OnItemClickListener):

@@ -16,7 +16,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.RecyclerViewAdapter
-import com.example.todoapp.Task
+import com.example.todoapp.data.SharedPreferencesHandler
+import com.example.todoapp.data.Task
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -25,28 +26,38 @@ import kotlinx.android.synthetic.main.card_view_task.view.*
 import kotlinx.android.synthetic.main.edit_text_layout.view.*
 import java.lang.reflect.Type
 
-class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListener, CreateTaskFragment.CreateTaskListener {
+class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListener,
+    CreateTaskFragment.CreateTaskListener {
 
     //To achieve static variable functionality...
-    companion object{
-        private var longTexts : HashMap<Int, String> = HashMap()
+    companion object {
+        var longTexts: HashMap<Int, String> = HashMap()
     }
 
     private val ALERT_TITLE = "Please enter your task!"
     private val RENAME_TITLE = "Edit"
     private val SHARED_PREF_TASKS = "TASKS"
     private val SHARED_PREF_LTEXT = "LTEXT"
-    private var adapter : RecyclerViewAdapter? = null
-    private var data : ArrayList<Task>? = null
-    private var recyclerView : RecyclerView? = null
+    private var adapter: RecyclerViewAdapter? = null
+    private var data: ArrayList<Task>? = null
+    private var recyclerView: RecyclerView? = null
     private var dragged: Boolean = false
+    private var sharedPrefHandler: SharedPreferencesHandler? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        sharedPrefHandler = SharedPreferencesHandler(this)
+
         //Read data from SharedPreferences
-        loadData()
+        //loadData()
+
+        data = sharedPrefHandler?.loadData(SHARED_PREF_TASKS, SHARED_PREF_LTEXT)
+
+        if(data == null){
+            data = ArrayList()
+        }
 
         //Initialize recycler view...
         recyclerView = recViewId
@@ -56,9 +67,9 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         recyclerView?.adapter = adapter
 
         val taskIndex = intent.getIntExtra("index", -1)
-        val taskLongText : String? = intent.getStringExtra("long_text")
+        val taskLongText: String? = intent.getStringExtra("long_text")
 
-        if(taskIndex != -1 && !taskLongText.isNullOrEmpty()){
+        if (taskIndex != -1 && !taskLongText.isNullOrEmpty()) {
             longTexts[taskIndex] = taskLongText
         }
 
@@ -67,8 +78,10 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         setTaskNumber()
 
         //Gesture listener
-        val myCallback = object: ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT){
+        val myCallback = object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        ) {
             var from = 0
             var to = 0
 
@@ -108,7 +121,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                 super.onMoved(recyclerView, viewHolder, fromPos, target, toPos, x, y)
                 Log.d("longtexts:", "positions: $fromPos $toPos $longTexts")
                 updateLongTextMap(fromPos, toPos)
-                if(!dragged || fromPos == toPos) viewHolder.itemView.alpha = 1.0f
+                if (!dragged || fromPos == toPos) viewHolder.itemView.alpha = 1.0f
                 //recyclerView.scrollToPosition(toPos)
             }
 
@@ -116,7 +129,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
             override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
                 super.onSelectedChanged(viewHolder, actionState)
 
-                if(actionState == ItemTouchHelper.ACTION_STATE_DRAG){
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
                     viewHolder?.itemView?.alpha = 0.5f
                 }
             }
@@ -126,7 +139,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                 viewHolder: RecyclerView.ViewHolder
             ) {
                 super.clearView(recyclerView, viewHolder)
-                if(dragged){
+                if (dragged) {
                     resetAdapter()
                     dragged = false
                 }
@@ -152,13 +165,19 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                 )
 
                 val background = ColorDrawable(Color.RED)
-                background.setBounds(0, viewHolder.itemView.top, viewHolder.itemView.left + dX.toInt(), viewHolder.itemView.bottom)
+                background.setBounds(
+                    0,
+                    viewHolder.itemView.top,
+                    viewHolder.itemView.left + dX.toInt(),
+                    viewHolder.itemView.bottom
+                )
                 background.draw(c)
 
             }
+
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
                 val holder = viewHolder as RecyclerViewAdapter.ViewHolder
-                when(direction){
+                when (direction) {
                     ItemTouchHelper.RIGHT -> {
                         data?.removeAt(holder.adapterPosition)
                         removeLongTexts(holder.adapterPosition)
@@ -183,7 +202,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                                         .show()
                                 }*/
                                 .show()
-                            }
+                        }
                         /* To only enable removing of done tasks...
                         else {
                             //Need to re-add item to RecyclerView, because onSwiped deletes it
@@ -248,10 +267,11 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
     override fun onPause() {
         super.onPause()
         //Save data to Shared Pref
-        saveData()
+        //saveData()
+        sharedPrefHandler?.saveData(SHARED_PREF_TASKS, SHARED_PREF_LTEXT, data!!)
     }
 
-    private fun showAlertDialog(position:Int, data: ArrayList<Task>) {
+    private fun showAlertDialog(position: Int, data: ArrayList<Task>) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(ALERT_TITLE)
         val inflater = layoutInflater
@@ -259,21 +279,21 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         val editText = dialogLayout.edit_text
         builder.setView(dialogLayout)
         val alertDialog = builder.create()
-        builder.setPositiveButton("Add"){ _, _ ->
+        builder.setPositiveButton("Add") { _, _ ->
             val task = editText.text.toString()
             addTask(task)
         }
 
-        builder.setNegativeButton("Cancel"){ _, _ ->
+        builder.setNegativeButton("Cancel") { _, _ ->
             alertDialog.cancel()
         }
 
-        if (position >= 0 && !this.floatingActionButton.isPressed){
+        if (position >= 0 && !this.floatingActionButton.isPressed) {
             builder.create()
             builder.setTitle(RENAME_TITLE)
             val text = data[position].taskText
             editText.append(text)
-            builder.setPositiveButton("Edit"){_, _ ->
+            builder.setPositiveButton("Edit") { _, _ ->
                 val task = editText.text.toString()
                 data[position].taskText = task
                 adapter?.notifyItemChanged(position)
@@ -287,16 +307,15 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         builder.show()
     }
 
-    private fun addTask(task: String){
-        if(task.isNotEmpty()){
+    private fun addTask(task: String) {
+        if (task.isNotEmpty()) {
             data?.add(Task(task, false))
             adapter?.notifyItemInserted(data!!.size - 1)
             recyclerView?.smoothScrollToPosition(data!!.size - 1)
             setTaskNumber()
             longTexts[data!!.lastIndex] = ""
             recyclerView?.smoothScrollToPosition(data!!.size - 1)
-        }
-        else{
+        } else {
             Snackbar
                 .make(recyclerView!!, "You can't add an empty task!", Snackbar.LENGTH_SHORT)
                 .show()
@@ -305,7 +324,9 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
 
     }
 
-    private fun saveData(){
+
+    /*
+    private fun saveData() {
         val sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         val gson = Gson()
@@ -319,50 +340,50 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
 
         editor.apply()
     }
+    */
 
-    private fun loadData(){
+    /*
+    private fun loadData() {
         val sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE)
 
         val gson = Gson()
 
         var json = sharedPreferences.getString(SHARED_PREF_TASKS, null)
 
-        var type: Type = object: TypeToken<ArrayList<Task>>(){}.type
+        var type: Type = object : TypeToken<ArrayList<Task>>() {}.type
 
         data = gson.fromJson(json, type)
 
-        if(data == null){
+        if (data == null) {
             data = ArrayList()
         }
 
         json = sharedPreferences.getString(SHARED_PREF_LTEXT, null)
 
-        type = object: TypeToken<HashMap<Int, String>>(){}.type
+        type = object : TypeToken<HashMap<Int, String>>() {}.type
 
-        val temp : HashMap<Int, String>? = gson.fromJson(json, type)
-        if(temp != null) longTexts = temp
-
-
+        val temp: HashMap<Int, String>? = gson.fromJson(json, type)
+        if (temp != null) longTexts = temp
     }
-
+*/
     @SuppressLint("SetTextI18n")
-    private fun setTaskNumber(){
+    private fun setTaskNumber() {
         taskNumber.text = "${adapter?.itemCount}"
     }
 
-    private fun removeLongTexts(position: Int){
+    private fun removeLongTexts(position: Int) {
         val temp: HashMap<Int, String> = HashMap()
         longTexts.remove(position)
 
-        if(position == 0){
-            for (key in longTexts.keys){
+        if (position == 0) {
+            for (key in longTexts.keys) {
                 val keyTemp = key - 1
                 temp[keyTemp] = longTexts[key] as String
             }
         }
 
         for (key in longTexts.keys) {
-            if (key < position){
+            if (key < position) {
                 temp[key] = longTexts[key] as String
                 continue
             }
@@ -372,8 +393,8 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         longTexts = temp
     }
 
-    private fun generateTestData(){
-        for (i in 0..10){
+    private fun generateTestData() {
+        for (i in 0..10) {
             data?.add(Task("Task $i", false))
             longTexts[i] = i.toString()
         }
@@ -387,12 +408,12 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
             itemView.task_text.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG
         else
             itemView.task_text.paintFlags = 0
-        if(itemView.checkBox.isChecked){
+        if (itemView.checkBox.isChecked) {
             itemView.alpha = 0.4f
         } else {
             itemView.alpha = 1.0f
         }
-        if(data?.getOrNull(position) != null) {
+        if (data?.getOrNull(position) != null) {
             data!![position].done = itemView.checkBox.isChecked
             data!![position].taskText = itemView.task_text.text.toString()
         }
@@ -402,7 +423,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         val intent = Intent(this, LongTextActivity::class.java)
         intent.putExtra("task_name", data!![position].taskText)
         intent.putExtra("index", position)
-        if(position in longTexts.keys){
+        if (position in longTexts.keys) {
             intent.putExtra("long_text", longTexts[position])
         }
         startActivity(intent)
