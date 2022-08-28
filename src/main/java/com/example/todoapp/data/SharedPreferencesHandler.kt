@@ -48,7 +48,6 @@ class SharedPreferencesHandler(private val activity: Activity) {
         if (data == null) {
             data = ArrayList()
         }
-
          */
 
         json = sharedPreferences.getString(sharedPrefLtext, null)
@@ -59,6 +58,5 @@ class SharedPreferencesHandler(private val activity: Activity) {
         if (temp != null) MainActivity.longTexts = temp
 
         return data
-
     }
 }

@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
             longTexts[taskIndex] = taskLongText
         }
 
-        //generateTestData()
+        //generateTestData(0, 10)
 
         setTaskNumber()
 
@@ -82,8 +82,6 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
             ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
             ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         ) {
-            var from = 0
-            var to = 0
 
             override fun onMove(
                 recyclerView: RecyclerView,
@@ -93,9 +91,9 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
 
                 val recAdapter = recyclerView.adapter as RecyclerViewAdapter
 
-                from = viewHolder.adapterPosition
+                val from = viewHolder.adapterPosition
 
-                to = target.adapterPosition
+                val to = target.adapterPosition
 
                 recAdapter.notifyItemMoved(from, to)
 
@@ -393,12 +391,12 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         longTexts = temp
     }
 
-    private fun generateTestData() {
-        for (i in 0..10) {
+    private fun generateTestData(startIndex: Int, endIndex: Int) {
+        for (i in startIndex..endIndex) {
             data?.add(Task("Task $i", false))
             longTexts[i] = i.toString()
         }
-        adapter?.notifyItemRangeInserted(0, 10)
+        adapter?.notifyItemRangeInserted(startIndex, endIndex)
     }
 
     //OnClickListener for RecyclerView items

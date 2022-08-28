@@ -1,19 +1,17 @@
 package com.example.todoapp.activities
 
-import android.app.DatePickerDialog
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.transition.Visibility
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.DatePicker
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.DialogFragment
 import com.example.todoapp.R
 import kotlinx.android.synthetic.main.activity_task_create.*
 import kotlinx.android.synthetic.main.activity_task_create.view.*
-import java.util.*
-import javax.xml.datatype.DatatypeConstants.MONTHS
 
 class CreateTaskFragment(private val listener: CreateTaskListener): DialogFragment() {
 
@@ -31,7 +29,7 @@ class CreateTaskFragment(private val listener: CreateTaskListener): DialogFragme
         val rootView = inflater.inflate(R.layout.activity_task_create, container, false)
 
         rootView.create_button.setOnClickListener{
-            listener.onCreateTask(task_text2.text.toString())
+            listener.onCreateTask(task_title.text.toString())
             dismiss()
         }
 
