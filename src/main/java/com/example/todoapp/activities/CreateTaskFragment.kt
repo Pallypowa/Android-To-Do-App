@@ -1,5 +1,7 @@
 package com.example.todoapp.activities
 
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -10,13 +12,13 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.DialogFragment
 import com.example.todoapp.R
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_task_create.*
 import kotlinx.android.synthetic.main.activity_task_create.view.*
-
 class CreateTaskFragment(private val listener: CreateTaskListener): DialogFragment() {
 
     interface CreateTaskListener{
-        fun onCreateTask(task: String)
+        fun onCreateTask(task: String, longText: String)
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
@@ -29,12 +31,34 @@ class CreateTaskFragment(private val listener: CreateTaskListener): DialogFragme
         val rootView = inflater.inflate(R.layout.activity_task_create, container, false)
 
         rootView.create_button.setOnClickListener{
-            listener.onCreateTask(task_title.text.toString())
+            listener.onCreateTask(task_title.text.toString(), task_longtext.text.toString())
             dismiss()
         }
 
         rootView.cancel_button.setOnClickListener {
             dismiss()
+        }
+
+        rootView.date_switch.setOnClickListener {
+            val datePickerDialog = DatePickerDialog(rootView.context)
+            if(rootView.date_switch.isChecked){
+                datePickerDialog.show()
+                datePickerDialog.setOnDateSetListener { datePicker, i, i2, i3 ->
+                    Snackbar.make(rootView, "Date: $i/$i2/$i3", Snackbar.LENGTH_SHORT).show()
+                }
+            }
+        }
+
+        rootView.time_switch.setOnClickListener {
+            val timePickerDialog = TimePickerDialog(rootView.context,
+                { timePicker, i, i2 ->  },
+                12,
+                0,
+                true)
+            if (rootView.time_switch.isChecked){
+                timePickerDialog.show()
+            }
+
         }
 
 

@@ -240,9 +240,10 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
 
         floatingActionButton.setOnClickListener {
             //showAlertDialog(0, data!!)
-            //val intent = Intent(this, TaskCreateActivity::class.java)
+            //val intent = Intent(this, CreateTaskActivity::class.java)
             val createTaskFragment = CreateTaskFragment(this)
             createTaskFragment.show(supportFragmentManager, "dialogFragment")
+
 
             //startActivity(intent)
         }
@@ -279,7 +280,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         val alertDialog = builder.create()
         builder.setPositiveButton("Add") { _, _ ->
             val task = editText.text.toString()
-            addTask(task)
+            //addTask(task)
         }
 
         builder.setNegativeButton("Cancel") { _, _ ->
@@ -305,14 +306,19 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         builder.show()
     }
 
-    private fun addTask(task: String) {
+    private fun addTask(task: String, longText: String) {
         if (task.isNotEmpty()) {
             data?.add(Task(task, false))
             adapter?.notifyItemInserted(data!!.size - 1)
             recyclerView?.smoothScrollToPosition(data!!.size - 1)
             setTaskNumber()
+
+            if(longText.isNotEmpty()){
+                longTexts[data!!.lastIndex] = longText
+                return
+            }
+
             longTexts[data!!.lastIndex] = ""
-            recyclerView?.smoothScrollToPosition(data!!.size - 1)
         } else {
             Snackbar
                 .make(recyclerView!!, "You can't add an empty task!", Snackbar.LENGTH_SHORT)
@@ -427,7 +433,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         startActivity(intent)
     }
 
-    override fun onCreateTask(task: String) {
-        addTask(task)
+    override fun onCreateTask(task: String, longText: String) {
+        addTask(task, longText)
     }
 }
