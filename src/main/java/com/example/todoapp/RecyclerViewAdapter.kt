@@ -21,10 +21,12 @@ class RecyclerViewAdapter(private var dataList: List<Task>, private var listener
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val taskText: TextView = itemView.findViewById(R.id.task_text)
         val isDone: CheckBox = itemView.findViewById(R.id.checkBox)
+        val deadline: TextView = itemView.findViewById(R.id.deadline_text)
 
         fun bind(holder: ViewHolder,position: Int, listener: OnItemClickListener, task: Task){
             holder.taskText.text = task.taskText
             holder.isDone.isChecked = task.done
+            holder.deadline.text = task.deadline
 
             if(holder.isDone.isChecked)
                 holder.taskText.paintFlags = Paint.STRIKE_THRU_TEXT_FLAG

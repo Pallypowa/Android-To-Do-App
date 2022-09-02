@@ -39,7 +39,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="35dp"
             android:background="@android:color/transparent"
             android:minWidth="48dp"
             android:minHeight="48dp"
@@ -70,18 +70,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
-
-        <Button
-            android:id="@+id/create_button"
-            android:layout_width="200dp"
-            android:layout_height="60dp"
-            android:layout_marginTop="40dp"
-            android:backgroundTint="#5ca8e0"
-            android:text="@string/create"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="@+id/task_title"
-            app:layout_constraintStart_toStartOf="@+id/task_title"
-            app:layout_constraintTop_toBottomOf="@+id/textView8" />
 
         <TextView
             android:id="@+id/textView3"
@@ -129,6 +117,38 @@
             app:srcCompat="@drawable/ic_baseline_calendar" />
 
         <TextView
+            android:id="@+id/date_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:editable="false"
+            android:inputType="date"
+            android:text="TextView"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toStartOf="@+id/date_switch"
+            app:layout_constraintHorizontal_bias="0.259"
+            app:layout_constraintStart_toEndOf="@+id/textView7"
+            app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+        <TextView
+            android:id="@+id/time_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:editable="false"
+            android:inputType="time"
+            android:text="TextView"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="invisible"
+            app:layout_constraintEnd_toStartOf="@+id/time_switch"
+            app:layout_constraintHorizontal_bias="0.236"
+            app:layout_constraintStart_toEndOf="@+id/textView8"
+            app:layout_constraintTop_toBottomOf="@+id/textView8" />
+
+        <TextView
             android:id="@+id/textView8"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -144,22 +164,35 @@
             android:id="@+id/imageView6"
             android:layout_width="35dp"
             android:layout_height="35dp"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:tint="#5ca8e0"
             app:layout_constraintStart_toStartOf="@+id/imageView5"
-            app:layout_constraintTop_toBottomOf="@+id/imageView5"
+            app:layout_constraintTop_toBottomOf="@+id/date_text"
             app:srcCompat="@drawable/ic_baseline_time" />
 
         <Switch
             android:id="@+id/time_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="30dp"
             android:scaleX="1.5"
             android:scaleY="1.5"
             android:thumbTint="#5ca8e0"
             app:layout_constraintEnd_toEndOf="@+id/date_switch"
-            app:layout_constraintTop_toBottomOf="@+id/date_switch" />
+            app:layout_constraintTop_toBottomOf="@+id/date_text" />
+
+        <Button
+            android:id="@+id/create_button"
+            android:layout_width="200dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="40dp"
+            android:backgroundTint="#5ca8e0"
+            android:text="@string/create"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="@+id/time_text"
+            app:layout_constraintStart_toStartOf="@+id/time_text"
+            app:layout_constraintTop_toBottomOf="@+id/time_text" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </LinearLayout>

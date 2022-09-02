@@ -306,9 +306,9 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         builder.show()
     }
 
-    private fun addTask(task: String, longText: String) {
+    private fun addTask(task: String, longText: String, deadline: String) {
         if (task.isNotEmpty()) {
-            data?.add(Task(task, false))
+            data?.add(Task(task, false, deadline))
             adapter?.notifyItemInserted(data!!.size - 1)
             recyclerView?.smoothScrollToPosition(data!!.size - 1)
             setTaskNumber()
@@ -317,7 +317,6 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                 longTexts[data!!.lastIndex] = longText
                 return
             }
-
             longTexts[data!!.lastIndex] = ""
         } else {
             Snackbar
@@ -399,7 +398,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
 
     private fun generateTestData(startIndex: Int, endIndex: Int) {
         for (i in startIndex..endIndex) {
-            data?.add(Task("Task $i", false))
+            data?.add(Task("Task $i", false, ""))
             longTexts[i] = i.toString()
         }
         adapter?.notifyItemRangeInserted(startIndex, endIndex)
@@ -433,7 +432,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         startActivity(intent)
     }
 
-    override fun onCreateTask(task: String, longText: String) {
-        addTask(task, longText)
+    override fun onCreateTask(task: String, longText: String, deadline: String) {
+        addTask(task, longText, deadline)
     }
 }
