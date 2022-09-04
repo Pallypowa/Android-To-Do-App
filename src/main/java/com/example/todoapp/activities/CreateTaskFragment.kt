@@ -2,24 +2,22 @@ package com.example.todoapp.activities
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
-import android.content.DialogInterface
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import android.transition.Visibility
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.annotation.RequiresApi
-import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.DialogFragment
 import com.example.todoapp.R
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_task_create.*
 import kotlinx.android.synthetic.main.activity_task_create.view.*
-import java.time.LocalDate
+import java.text.DateFormatSymbols
 import java.time.LocalDateTime
+import java.time.Month
 import java.util.*
 
 class CreateTaskFragment(private val listener: CreateTaskListener): DialogFragment() {
@@ -59,7 +57,8 @@ class CreateTaskFragment(private val listener: CreateTaskListener): DialogFragme
                     hideText(date_text)
                 }
                 else{
-                    date_text.text = "$i/${padWithZeros(i2 + 1)}/${padWithZeros(i3)}"
+
+                    date_text.text = "${getMonthName(i2 + 1)} $i3"
                     showText(date_text)
                     date = date_text.text.toString()
                 }
@@ -72,14 +71,15 @@ class CreateTaskFragment(private val listener: CreateTaskListener): DialogFragme
                 datePickerDialog.show()
             }
             else {
+                date_text.text = ""
                 hideText(date_text)
             }
         }
 
         rootView.time_switch.setOnClickListener {
-            var hours: Int = 0
-            var mins: Int = 0
-            val listener = TimePickerDialog.OnTimeSetListener { timePicker, i, i2 ->
+            var hours: Int
+            var mins: Int
+            val listener = TimePickerDialog.OnTimeSetListener { _, i, i2 ->
                 hours = i
                 mins = i2
                 time_text.text = "${padWithZeros(hours)}:${padWithZeros(mins)}"
@@ -91,6 +91,7 @@ class CreateTaskFragment(private val listener: CreateTaskListener): DialogFragme
                 12,
                 0,
                 true)
+
             timePickerDialog.setOnDismissListener{
                 rootView.time_switch.isChecked = false
             }
@@ -98,6 +99,7 @@ class CreateTaskFragment(private val listener: CreateTaskListener): DialogFragme
                 timePickerDialog.show()
             }
             else{
+                time_text.text = ""
                 hideText(time_text)
             }
 
@@ -124,5 +126,15 @@ class CreateTaskFragment(private val listener: CreateTaskListener): DialogFragme
         val timeString = time.toString()
         if(timeString.length == 1) return "0$timeString"
         return timeString
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun getMonthName(month: Int): String{
+        var monthName = Month.of(month).toString()
+
+        monthName = monthName.substring(0, 3)
+        monthName = monthName.lowercase()
+        monthName = monthName.capitalize()
+        return monthName
     }
 }

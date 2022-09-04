@@ -177,10 +177,11 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                 val holder = viewHolder as RecyclerViewAdapter.ViewHolder
                 when (direction) {
                     ItemTouchHelper.RIGHT -> {
+                        val deletedData = data!![holder.adapterPosition]
+                        val deletedLongText = longTexts[holder.adapterPosition]
                         data?.removeAt(holder.adapterPosition)
                         removeLongTexts(holder.adapterPosition)
                         adapter?.notifyItemRemoved(holder.adapterPosition)
-                        //adapter?.notifyDataSetChanged()
 
                         //Reduce counter...
                         setTaskNumber()
@@ -191,31 +192,17 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                         recyclerView?.let {
                             Snackbar
                                 .make(it, "Task has been deleted", Snackbar.LENGTH_SHORT)
-                                /*.setAction("Undo")
+                                .setAction("Undo")
                                 {
-                                    data?.add(holder.adapterPosition, deletedData)
-                                    adapter?.notifyItemInserted(5)
+                                    data?.add(deletedData)
+                                    longTexts[data!!.lastIndex] = deletedLongText!!
+                                    adapter?.notifyItemInserted(data!!.lastIndex)
                                     Snackbar
                                         .make(recyclerView!!, "Task has been restored", Snackbar.LENGTH_SHORT)
                                         .show()
-                                }*/
+                                }
                                 .show()
                         }
-                        /* To only enable removing of done tasks...
-                        else {
-                            //Need to re-add item to RecyclerView, because onSwiped deletes it
-                            val position = holder.adapterPosition
-                            val currData = data!![position]
-                            data?.removeAt(position)
-                            adapter?.notifyItemRemoved(viewHolder.adapterPosition)
-                            data?.add(position, currData)
-                            adapter?.notifyItemInserted(position)
-                            Snackbar
-                                .make(recyclerView!!, "You can only remove tasks, that are done!", Snackbar.LENGTH_SHORT)
-                                .show()
-
-                        }
-                         */
                     }
                     ItemTouchHelper.LEFT -> {
                         val position = holder.adapterPosition
