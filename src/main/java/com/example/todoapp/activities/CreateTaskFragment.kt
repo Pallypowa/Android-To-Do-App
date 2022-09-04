@@ -95,6 +95,7 @@ class CreateTaskFragment(private val listener: CreateTaskListener): DialogFragme
             timePickerDialog.setOnDismissListener{
                 rootView.time_switch.isChecked = false
             }
+
             if (rootView.time_switch.isChecked){
                 timePickerDialog.show()
             }

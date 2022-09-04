@@ -66,6 +66,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         adapter = RecyclerViewAdapter(data!!, this)
         recyclerView?.adapter = adapter
 
+
         val taskIndex = intent.getIntExtra("index", -1)
         val taskLongText: String? = intent.getStringExtra("long_text")
 
@@ -205,16 +206,15 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                         }
                     }
                     ItemTouchHelper.LEFT -> {
-                        val position = holder.adapterPosition
-                        val currData = data!![position]
-                        data?.removeAt(position)
-
-                        adapter?.notifyItemRemoved(viewHolder.adapterPosition)
-                        data?.add(position, currData)
-                        adapter?.notifyItemInserted(position)
-
-                        showAlertDialog(position, data!!)
-
+//                        val position = holder.adapterPosition
+//                        val currData = data!![position]
+//                        data?.removeAt(position)
+//
+//                        adapter?.notifyItemRemoved(viewHolder.adapterPosition)
+//                        data?.add(position, currData)
+//                        adapter?.notifyItemInserted(position)
+//
+//                        showAlertDialog(position, data!!)
                     }
                 }
 
@@ -226,13 +226,8 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         myHelper.attachToRecyclerView(recyclerView)
 
         floatingActionButton.setOnClickListener {
-            //showAlertDialog(0, data!!)
-            //val intent = Intent(this, CreateTaskActivity::class.java)
             val createTaskFragment = CreateTaskFragment(this)
             createTaskFragment.show(supportFragmentManager, "dialogFragment")
-
-
-            //startActivity(intent)
         }
 
     }
@@ -417,6 +412,10 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
             intent.putExtra("long_text", longTexts[position])
         }
         startActivity(intent)
+    }
+
+    override fun onEditTextChanged(position: Int, text: String) {
+        data!![position].taskText = text
     }
 
     override fun onCreateTask(task: String, longText: String, deadline: String) {

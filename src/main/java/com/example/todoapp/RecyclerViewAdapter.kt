@@ -1,10 +1,12 @@
 package com.example.todoapp
 
 import android.graphics.Paint
+import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.data.Task
@@ -16,15 +18,16 @@ class RecyclerViewAdapter(private var dataList: List<Task>, private var listener
     interface OnItemClickListener{
         fun onCheckBoxClicked(position: Int, itemView: View)
         fun onCardClicked(position: Int, itemView: View)
+        fun onEditTextChanged(position: Int, text: String)
     }
 
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
-        val taskText: TextView = itemView.findViewById(R.id.task_text)
+        val taskText: EditText = itemView.findViewById(R.id.task_text)
         val isDone: CheckBox = itemView.findViewById(R.id.checkBox)
         val deadline: TextView = itemView.findViewById(R.id.deadline_text)
 
         fun bind(holder: ViewHolder,position: Int, listener: OnItemClickListener, task: Task){
-            holder.taskText.text = task.taskText
+            holder.taskText.setText(task.taskText)
             holder.isDone.isChecked = task.done
             holder.deadline.text = task.deadline
 
@@ -36,6 +39,11 @@ class RecyclerViewAdapter(private var dataList: List<Task>, private var listener
             }
             itemView.setOnClickListener{
                 listener.onCardClicked(position, itemView)
+            }
+            taskText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) {
+                    listener.onEditTextChanged(position, taskText.text.toString())
+                }
             }
         }
 
