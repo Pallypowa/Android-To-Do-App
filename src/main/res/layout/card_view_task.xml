@@ -26,25 +26,30 @@
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:background="@android:color/transparent"
+                android:capitalize="characters"
                 android:singleLine="true"
                 android:textAlignment="textStart"
-                android:textSize="25sp" />
+                android:textSize="20sp"
+                android:textStyle="normal" />
 
             <TextView
                 android:id="@+id/deadline_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:layout_weight="1"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
                 android:text="TextView"
                 android:textAlignment="textEnd"
-                android:textSize="15sp" />
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
             <CheckBox
                 android:id="@+id/checkBox"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginBottom="10dp"
                 android:buttonTint="#5ca8e0"
                 android:checked="false"
                 android:clickable="true"

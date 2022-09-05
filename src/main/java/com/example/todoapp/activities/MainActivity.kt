@@ -15,18 +15,15 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
-import com.example.todoapp.RecyclerViewAdapter
+import com.example.todoapp.adapters.TaskListAdapter
 import com.example.todoapp.data.SharedPreferencesHandler
 import com.example.todoapp.data.Task
 import com.google.android.material.snackbar.Snackbar
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.card_view_task.view.*
 import kotlinx.android.synthetic.main.edit_text_layout.view.*
-import java.lang.reflect.Type
 
-class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListener,
+class MainActivity : AppCompatActivity(), TaskListAdapter.OnItemClickListener,
     CreateTaskFragment.CreateTaskListener {
 
     //To achieve static variable functionality...
@@ -38,7 +35,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
     private val RENAME_TITLE = "Edit"
     private val SHARED_PREF_TASKS = "TASKS"
     private val SHARED_PREF_LTEXT = "LTEXT"
-    private var adapter: RecyclerViewAdapter? = null
+    private var adapter: TaskListAdapter? = null
     private var data: ArrayList<Task>? = null
     private var recyclerView: RecyclerView? = null
     private var dragged: Boolean = false
@@ -52,7 +49,6 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
 
         //Read data from SharedPreferences
         //loadData()
-
         data = sharedPrefHandler?.loadData(SHARED_PREF_TASKS, SHARED_PREF_LTEXT)
 
         if(data == null){
@@ -63,7 +59,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         recyclerView = recViewId
         recyclerView?.layoutManager = LinearLayoutManager(this)
 
-        adapter = RecyclerViewAdapter(data!!, this)
+        adapter = TaskListAdapter(data!!, this)
         recyclerView?.adapter = adapter
 
 
@@ -81,7 +77,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
         //Gesture listener
         val myCallback = object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
-            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+            ItemTouchHelper.RIGHT
         ) {
 
             override fun onMove(
@@ -90,7 +86,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                 target: RecyclerView.ViewHolder
             ): Boolean {
 
-                val recAdapter = recyclerView.adapter as RecyclerViewAdapter
+                val recAdapter = recyclerView.adapter as TaskListAdapter
 
                 val from = viewHolder.adapterPosition
 
@@ -175,7 +171,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                val holder = viewHolder as RecyclerViewAdapter.ViewHolder
+                val holder = viewHolder as TaskListAdapter.ViewHolder
                 when (direction) {
                     ItemTouchHelper.RIGHT -> {
                         val deletedData = data!![holder.adapterPosition]
@@ -205,7 +201,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
                                 .show()
                         }
                     }
-                    ItemTouchHelper.LEFT -> {
+//                    ItemTouchHelper.LEFT -> {
 //                        val position = holder.adapterPosition
 //                        val currData = data!![position]
 //                        data?.removeAt(position)
@@ -215,7 +211,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
 //                        adapter?.notifyItemInserted(position)
 //
 //                        showAlertDialog(position, data!!)
-                    }
+//                    }
                 }
 
             }
@@ -240,7 +236,7 @@ class MainActivity : AppCompatActivity(), RecyclerViewAdapter.OnItemClickListene
     }
 
     private fun resetAdapter() {
-        adapter = RecyclerViewAdapter(data!!, this)
+        adapter = TaskListAdapter(data!!, this)
         recyclerView?.adapter = adapter
         adapter?.notifyItemRangeChanged(0, data!!.size)
     }

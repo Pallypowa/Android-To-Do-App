@@ -1,19 +1,21 @@
-package com.example.todoapp
+package com.example.todoapp.adapters
 
 import android.graphics.Paint
-import android.text.Editable
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.todoapp.R
 import com.example.todoapp.data.Task
 import kotlinx.android.synthetic.main.card_view_task.view.*
 
-class RecyclerViewAdapter(private var dataList: List<Task>, private var listener: OnItemClickListener):
-    RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder>(){
+class TaskListAdapter(private var dataList: List<Task>, private var listener: OnItemClickListener):
+    RecyclerView.Adapter<TaskListAdapter.ViewHolder>(){
 
     interface OnItemClickListener{
         fun onCheckBoxClicked(position: Int, itemView: View)
@@ -26,7 +28,7 @@ class RecyclerViewAdapter(private var dataList: List<Task>, private var listener
         val isDone: CheckBox = itemView.findViewById(R.id.checkBox)
         val deadline: TextView = itemView.findViewById(R.id.deadline_text)
 
-        fun bind(holder: ViewHolder,position: Int, listener: OnItemClickListener, task: Task){
+        fun bind(holder: ViewHolder, position: Int, listener: OnItemClickListener, task: Task){
             holder.taskText.setText(task.taskText)
             holder.isDone.isChecked = task.done
             holder.deadline.text = task.deadline
@@ -40,11 +42,26 @@ class RecyclerViewAdapter(private var dataList: List<Task>, private var listener
             itemView.setOnClickListener{
                 listener.onCardClicked(position, itemView)
             }
+
+            //If focus has changed...
             taskText.onFocusChangeListener = View.OnFocusChangeListener { _, hasFocus ->
                 if (!hasFocus) {
                     listener.onEditTextChanged(position, taskText.text.toString())
+
                 }
             }
+
+            //If enter is pressed...
+            taskText.setOnEditorActionListener{view, actionId, keyEvent ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE ||
+                    keyEvent == null ||
+                    keyEvent.keyCode == KeyEvent.KEYCODE_ENTER){
+                    listener.onEditTextChanged(position, taskText.text.toString())
+                    true
+                }
+                false
+            }
+
         }
 
     }
