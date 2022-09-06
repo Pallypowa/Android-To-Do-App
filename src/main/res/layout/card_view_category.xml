@@ -20,6 +20,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="8dp"
+                android:backgroundTintMode="multiply"
                 android:text="Work"
                 android:textSize="25sp" />
 
@@ -33,12 +34,13 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/category_color"
             android:layout_width="100dp"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             android:layout_gravity="center"
             android:layout_margin="10dp"
             android:layout_weight="1"
-            app:srcCompat="@android:drawable/ic_delete" />
+            android:background="#C32222"
+            app:srcCompat="@drawable/rectangle" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

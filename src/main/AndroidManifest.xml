@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TodoApp">
         <activity
-            android:name=".CategoryListActivity"
+            android:name=".activities.CategoryListActivity"
             android:exported="false" />
         <activity
             android:name=".activities.LongTextActivity"

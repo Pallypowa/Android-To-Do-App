@@ -1,3 +1,4 @@
 package com.example.todoapp.data
 
-data class Task(var taskText: String, var done: Boolean, var deadline: String)
+//Will need to add the category's id
+data class Task(var taskText: String, var done: Boolean, var deadline: String, /*val categoryId: Int*/)
