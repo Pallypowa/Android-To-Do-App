@@ -23,7 +23,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.card_view_task.view.*
 import kotlinx.android.synthetic.main.edit_text_layout.view.*
 
-class MainActivity : AppCompatActivity(), TaskListAdapter.OnItemClickListener,
+class MainActivity : AppCompatActivity(), TaskListAdapter.OnTaskClickListener,
     CreateTaskFragment.CreateTaskListener {
 
     //To achieve static variable functionality...

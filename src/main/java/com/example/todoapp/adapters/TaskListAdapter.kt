@@ -14,10 +14,10 @@ import com.example.todoapp.R
 import com.example.todoapp.data.Task
 import kotlinx.android.synthetic.main.card_view_task.view.*
 
-class TaskListAdapter(private var dataList: List<Task>, private var listener: OnItemClickListener):
+class TaskListAdapter(private var dataList: List<Task>, private var listener: OnTaskClickListener):
     RecyclerView.Adapter<TaskListAdapter.ViewHolder>(){
 
-    interface OnItemClickListener{
+    interface OnTaskClickListener{
         fun onCheckBoxClicked(position: Int, itemView: View)
         fun onCardClicked(position: Int, itemView: View)
         fun onEditTextChanged(position: Int, text: String)
@@ -28,7 +28,7 @@ class TaskListAdapter(private var dataList: List<Task>, private var listener: On
         val isDone: CheckBox = itemView.findViewById(R.id.checkBox)
         val deadline: TextView = itemView.findViewById(R.id.deadline_text)
 
-        fun bind(holder: ViewHolder, position: Int, listener: OnItemClickListener, task: Task){
+        fun bind(holder: ViewHolder, position: Int, listener: OnTaskClickListener, task: Task){
             holder.taskText.setText(task.taskText)
             holder.isDone.isChecked = task.done
             holder.deadline.text = task.deadline
