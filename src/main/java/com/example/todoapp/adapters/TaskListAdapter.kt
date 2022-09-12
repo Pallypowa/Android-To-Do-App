@@ -11,7 +11,7 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
-import com.example.todoapp.data.Task
+import com.example.todoapp.database.Task
 import kotlinx.android.synthetic.main.card_view_task.view.*
 
 class TaskListAdapter(private var dataList: List<Task>, private var listener: OnTaskClickListener):

@@ -6,11 +6,8 @@ import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todoapp.R
 import com.example.todoapp.adapters.CategoryListAdapter
-import com.example.todoapp.data.Category
-import com.example.todoapp.data.Task
-import com.google.android.material.snackbar.Snackbar
+import com.example.todoapp.database.Category
 import kotlinx.android.synthetic.main.activity_category_list.*
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.edit_text_layout.view.*
 import kotlin.collections.ArrayList
 

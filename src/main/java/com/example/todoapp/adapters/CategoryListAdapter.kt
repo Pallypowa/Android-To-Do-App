@@ -9,7 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
-import com.example.todoapp.data.Category
+import com.example.todoapp.database.Category
 import com.google.android.material.snackbar.Snackbar
 
 class CategoryListAdapter(private val categoryList: List<Category>,

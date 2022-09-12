@@ -1,4 +1,4 @@
-package com.example.todoapp.data
+package com.example.todoapp.database
 
 import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity

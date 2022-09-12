@@ -16,8 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todoapp.R
 import com.example.todoapp.adapters.TaskListAdapter
-import com.example.todoapp.data.SharedPreferencesHandler
-import com.example.todoapp.data.Task
+import com.example.todoapp.database.DataBaseHelper
+import com.example.todoapp.database.SharedPreferencesHandler
+import com.example.todoapp.database.Task
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.card_view_task.view.*
@@ -35,31 +36,39 @@ class MainActivity : AppCompatActivity(), TaskListAdapter.OnTaskClickListener,
     private val RENAME_TITLE = "Edit"
     private val SHARED_PREF_TASKS = "TASKS"
     private val SHARED_PREF_LTEXT = "LTEXT"
+
+
     private var adapter: TaskListAdapter? = null
-    private var data: ArrayList<Task>? = null
+    private var tasks: ArrayList<Task>? = null
     private var recyclerView: RecyclerView? = null
     private var dragged: Boolean = false
     private var sharedPrefHandler: SharedPreferencesHandler? = null
+
+    private var database: DataBaseHelper? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        sharedPrefHandler = SharedPreferencesHandler(this)
+        initDatabase()
+        tasks = database!!.readTasks(0)
+        //haredPrefHandler = SharedPreferencesHandler(this)
 
         //Read data from SharedPreferences
         //loadData()
-        data = sharedPrefHandler?.loadData(SHARED_PREF_TASKS, SHARED_PREF_LTEXT)
+        //data = sharedPrefHandler?.loadData(SHARED_PREF_TASKS, SHARED_PREF_LTEXT)
 
-        if(data == null){
-            data = ArrayList()
+
+
+        if(tasks == null){
+            tasks = ArrayList()
         }
 
         //Initialize recycler view...
         recyclerView = recViewId
         recyclerView?.layoutManager = LinearLayoutManager(this)
 
-        adapter = TaskListAdapter(data!!, this)
+        adapter = TaskListAdapter(tasks!!, this)
         recyclerView?.adapter = adapter
 
 
@@ -94,11 +103,11 @@ class MainActivity : AppCompatActivity(), TaskListAdapter.OnTaskClickListener,
 
                 recAdapter.notifyItemMoved(from, to)
 
-                val originalPosData: Task = data!![from]
-                val otherData: Task = data!![to]
+                val originalPosData: Task = tasks!![from]
+                val otherData: Task = tasks!![to]
 
-                data!![to] = originalPosData
-                data!![from] = otherData
+                tasks!![to] = originalPosData
+                tasks!![from] = otherData
 
                 dragged = true
                 return true
@@ -174,9 +183,9 @@ class MainActivity : AppCompatActivity(), TaskListAdapter.OnTaskClickListener,
                 val holder = viewHolder as TaskListAdapter.ViewHolder
                 when (direction) {
                     ItemTouchHelper.RIGHT -> {
-                        val deletedData = data!![holder.adapterPosition]
+                        val deletedData = tasks!![holder.adapterPosition]
                         val deletedLongText = longTexts[holder.adapterPosition]
-                        data?.removeAt(holder.adapterPosition)
+                        tasks?.removeAt(holder.adapterPosition)
                         removeLongTexts(holder.adapterPosition)
                         adapter?.notifyItemRemoved(holder.adapterPosition)
 
@@ -191,9 +200,9 @@ class MainActivity : AppCompatActivity(), TaskListAdapter.OnTaskClickListener,
                                 .make(it, "Task has been deleted", Snackbar.LENGTH_SHORT)
                                 .setAction("Undo")
                                 {
-                                    data?.add(deletedData)
-                                    longTexts[data!!.lastIndex] = deletedLongText!!
-                                    adapter?.notifyItemInserted(data!!.lastIndex)
+                                    tasks?.add(deletedData)
+                                    longTexts[tasks!!.lastIndex] = deletedLongText!!
+                                    adapter?.notifyItemInserted(tasks!!.lastIndex)
                                     Snackbar
                                         .make(recyclerView!!, "Task has been restored", Snackbar.LENGTH_SHORT)
                                         .show()
@@ -236,16 +245,20 @@ class MainActivity : AppCompatActivity(), TaskListAdapter.OnTaskClickListener,
     }
 
     private fun resetAdapter() {
-        adapter = TaskListAdapter(data!!, this)
+        adapter = TaskListAdapter(tasks!!, this)
         recyclerView?.adapter = adapter
-        adapter?.notifyItemRangeChanged(0, data!!.size)
+        adapter?.notifyItemRangeChanged(0, tasks!!.size)
     }
 
     override fun onPause() {
         super.onPause()
         //Save data to Shared Pref
         //saveData()
-        sharedPrefHandler?.saveData(SHARED_PREF_TASKS, SHARED_PREF_LTEXT, data!!)
+        //sharedPrefHandler?.saveData(SHARED_PREF_TASKS, SHARED_PREF_LTEXT, tasks!!)
+        //Causes duplicate data...
+//        tasks?.forEach { task ->
+//            database?.addTask(task)
+//        }
     }
 
     private fun showAlertDialog(position: Int, data: ArrayList<Task>) {
@@ -286,16 +299,19 @@ class MainActivity : AppCompatActivity(), TaskListAdapter.OnTaskClickListener,
 
     private fun addTask(task: String, longText: String, deadline: String) {
         if (task.isNotEmpty()) {
-            data?.add(Task(task, false, deadline))
-            adapter?.notifyItemInserted(data!!.size - 1)
-            recyclerView?.smoothScrollToPosition(data!!.size - 1)
+            val task = Task(task, false, deadline, 0, longText)
+            tasks?.add(task)
+            //Later change it to onPause
+            database?.addTask(task)
+            adapter?.notifyItemInserted(tasks!!.size - 1)
+            recyclerView?.smoothScrollToPosition(tasks!!.size - 1)
             setTaskNumber()
 
             if(longText.isNotEmpty()){
-                longTexts[data!!.lastIndex] = longText
+                longTexts[tasks!!.lastIndex] = longText
                 return
             }
-            longTexts[data!!.lastIndex] = ""
+            longTexts[tasks!!.lastIndex] = ""
         } else {
             Snackbar
                 .make(recyclerView!!, "You can't add an empty task!", Snackbar.LENGTH_SHORT)
@@ -376,10 +392,14 @@ class MainActivity : AppCompatActivity(), TaskListAdapter.OnTaskClickListener,
 
     private fun generateTestData(startIndex: Int, endIndex: Int) {
         for (i in startIndex..endIndex) {
-            data?.add(Task("Task $i", false, ""))
+            tasks?.add(Task("Task $i", false, "", 0, ""))
             longTexts[i] = i.toString()
         }
         adapter?.notifyItemRangeInserted(startIndex, endIndex)
+    }
+
+    private fun initDatabase(){
+        database = DataBaseHelper(this)
     }
 
     //OnClickListener for RecyclerView items
@@ -394,24 +414,24 @@ class MainActivity : AppCompatActivity(), TaskListAdapter.OnTaskClickListener,
         } else {
             itemView.alpha = 1.0f
         }
-        if (data?.getOrNull(position) != null) {
-            data!![position].done = itemView.checkBox.isChecked
-            data!![position].taskText = itemView.task_text.text.toString()
+        if (tasks?.getOrNull(position) != null) {
+            tasks!![position].done = itemView.checkBox.isChecked
+            tasks!![position].taskText = itemView.task_text.text.toString()
         }
     }
 
     override fun onCardClicked(position: Int, itemView: View) {
         val intent = Intent(this, LongTextActivity::class.java)
-        intent.putExtra("task_name", data!![position].taskText)
+        intent.putExtra("task_name", tasks!![position].taskText)
         intent.putExtra("index", position)
         if (position in longTexts.keys) {
-            intent.putExtra("long_text", longTexts[position])
         }
+        intent.putExtra("long_text", tasks!![position].longText)
         startActivity(intent)
     }
 
     override fun onEditTextChanged(position: Int, text: String) {
-        data!![position].taskText = text
+        tasks!![position].taskText = text
     }
 
     override fun onCreateTask(task: String, longText: String, deadline: String) {
